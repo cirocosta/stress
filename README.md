@@ -1,5 +1,7 @@
 # stress 🔥
 
+> go get -u github.com/cirocosta/stress
+
 Runs a minimal stupid while loop over N cores (as detected by `runtime.NumCPU()` - see [pkg/runtime](https://golang.org/pkg/runtime/#NumCPU)).
 
 Arguments:
