@@ -2,6 +2,9 @@
 
 > go get -u github.com/cirocosta/stress
 
+
+## cpu
+
 Runs a minimal stupid while loop over N cores (as detected by `runtime.NumCPU()` - see [pkg/runtime](https://golang.org/pkg/runtime/#NumCPU)).
 
 Arguments:
@@ -24,6 +27,11 @@ For instance, having 8 threads:
 ...
 
 ```
+
+## mem 
+
+
+
 
 ## Docker
 

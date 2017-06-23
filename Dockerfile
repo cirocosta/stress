@@ -1,11 +1,15 @@
 FROM golang:alpine as builder
-WORKDIR /go/src/stress/
+RUN apk add --update gcc musl-dev
 
-ADD ./main.go ./
+WORKDIR /go/src/cpu/
+ADD ./cpu/main.go ./
 RUN go install -v
 
-FROM scratch
-COPY --from=builder /go/bin/stress /stress
+WORKDIR /src/mem/
+ADD ./mem /src/mem
+RUN gcc --static ./main.c -o /bin/mem
 
-ENTRYPOINT [ "/stress" ]
+FROM busybox
+COPY --from=builder /go/bin/cpu /usr/local/bin/cpu
+COPY --from=builder /bin/mem /usr/local/bin/mem
 
