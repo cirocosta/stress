@@ -63,7 +63,21 @@ Done!
 
 ## pid
 
-TODO
+Allocates N processes and then suspends the execution until SIGTERM | SIGINT.
+
+Arguments:
+- `-n` number of PIDS
+
+### Example
+
+```
+./pid 512
+Starting to spawn 512 blocking children
+[512] - child creted
+[511] - child creted
+...
+[0] - blocking
+```
 
 
 ## disk

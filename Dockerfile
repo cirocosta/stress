@@ -1,15 +1,13 @@
 FROM golang:alpine as builder
 RUN apk add --update gcc musl-dev
+ADD ./src /go/src/stress
+WORKDIR /go/src/stress
 
-WORKDIR /go/src/cpu/
-ADD ./cpu/main.go ./
-RUN go install -v
-
-WORKDIR /src/mem/
-ADD ./mem /src/mem
-RUN gcc --static ./main.c -o /bin/mem
+RUN pwd && ls
+RUN go build -v -o /bin/cpu ./cpu.go
+RUN gcc -v --static -O2 ./mem.c -o /bin/mem
+RUN gcc -v --static -O2 ./pid.c -o /bin/pid
 
 FROM busybox
-COPY --from=builder /go/bin/cpu /usr/local/bin/cpu
-COPY --from=builder /bin/mem /usr/local/bin/mem
+COPY --from=builder /bin/ /usr/local/bin/
 
