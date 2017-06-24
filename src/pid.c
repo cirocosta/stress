@@ -18,7 +18,7 @@ fork_so_much(int n)
 	while (--n) {
 		switch (pid = fork()) {
 			case -1:
-				_stress_must(0, "Fork returned -1.");
+				_STRESS_MUST(0, "Fork returned -1.");
 				break;
 			case 0:
 				printf("[%d] - blocking\n", n);

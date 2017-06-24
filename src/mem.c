@@ -19,7 +19,7 @@ allocate_memory(int n)
 	while (n-- > 0) {
 		alloc_mem_p = malloc(chunksize);
 
-		_stress_must(alloc_mem_p, "Couldn't allocate.");
+		_STRESS_MUST(alloc_mem_p, "Couldn't allocate.");
 		memset(alloc_mem_p, 0, chunksize);
 
 		printf("%d MB remaining.\n", n);

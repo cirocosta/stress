@@ -14,7 +14,7 @@
 #define _STRESS_TRUE 1
 #define _STRESS_FALSE 0
 
-#define _stress_must(condition, message, ...)                                  \
+#define _STRESS_MUST(condition, message, ...)                                  \
 	do {                                                                   \
 		if (!(condition)) {                                            \
 			fprintf(stderr, "Error:\n  ");                         \
@@ -52,22 +52,22 @@ stress_parse_args(int argc, char** argv, stress_args_t* args)
 	int pids = 0;
 	int c;
 
-	_stress_must(argc > 1, "%s\n", "Argument -n must be specified.");
+	_STRESS_MUST(argc > 1, "%s\n", "Argument -n must be specified.");
 
 	opterr = 0;
 	while ((c = getopt(argc, argv, "n:")) != -1) {
 		switch (c) {
 			case 'n':
 				nvalue = optarg;
-				_stress_must(stress_is_num(nvalue),
+				_STRESS_MUST(stress_is_num(nvalue),
 				             "Argument (n) must be an int");
 				break;
 		}
 	}
 
-	_stress_must(nvalue,
+	_STRESS_MUST(nvalue,
 	             "'n' arguments (number of pids') must be specified.");
-	_stress_must(nvalue > 0, "At least 1MB must be written");
+	_STRESS_MUST(nvalue > 0, "At least 1MB must be written");
 
 	args->n = atoi(nvalue);
 }
