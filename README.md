@@ -2,6 +2,17 @@
 
 > Collection of tools to stress a machine (cpu, mem, pid, disk).
 
+**TOC**
+
+- [cpu](#cpu)
+  - [Example](#example)
+- [mem](#mem)
+  - [Example](#example-1)
+- [pid](#pid)
+  - [Example](#example-2)
+- [disk](#disk)
+- [LICENSE](#license)
+
 ## cpu
 
 Runs load on `n` processes:
@@ -88,35 +99,6 @@ Arguments:
 ```
 docker run --rm cirocosta/stress disk -n 1024  
 -rw-r--r--    1 root     root        1.0G Jun 24 17:50 disk-out.txt
-```
-
-
-## Docker
-
-
-```sh
-# all CPUS for 1m
-docker run -d cirocosta/stress cpu
-7e92c728fd80...
-
-docker stats --no-stream
-CONTAINER       CPU %       ...   PIDS
-7e92c728fd80    861.19%     ...   9
-
-
-# all CPUS run for 15s
-docker run -d cirocosta/stress cpu -duration 15s
-7e92c728fd80...
-
-
-# memory up to 20M
-docker run cirocosta/stress mem 20
-Starting. Will allocated 20 MB
-19 MB remaining.
-...
-1 MB remaining.
-0 MB remaining.
-Done!
 ```
 
 ## LICENSE
