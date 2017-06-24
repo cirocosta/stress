@@ -13,8 +13,12 @@
 	do {                                                                   \
 		if (!(condition)) {                                            \
 			fprintf(stderr, "Error:\n  ");                         \
+			fprintf(stderr, "\n  ");                               \
 			fprintf(stderr, message, ##__VA_ARGS__);               \
 			fprintf(stderr, "\n\n");                               \
+			fprintf(stderr, "  File: %s \n", __FILE__);            \
+			fprintf(stderr, "  Line: %d \n", __LINE__);            \
+			fprintf(stderr, "\n");                                 \
 			fprintf(stderr, "Aborting.\n");                        \
 			exit(EXIT_FAILURE);                                    \
 		}                                                              \

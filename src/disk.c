@@ -6,7 +6,9 @@
 
 #include "./common.h"
 
-#define CHUNK_SIZE 4096
+#define KB(x) ((size_t)(x) << 10)
+#define MB(x) ((size_t)(x) << 20)
+#define CHUNK_SIZE KB(4)
 
 const char* USAGE = "\n\
   Description:\n\
@@ -28,7 +30,7 @@ parse_args(int argc, char** argv, args_t* args)
 	int pids = 0;
 	int c;
 
-	_must(argc < 2, "%s", USAGE);
+	_must(argc > 1, "%s\n  %s", "Argument -n must be specified.", USAGE);
 
 	opterr = 0;
 	while ((c = getopt(argc, argv, "n:")) != -1) {
@@ -47,30 +49,22 @@ parse_args(int argc, char** argv, args_t* args)
 	}
 
 	_must(nvalue, "'n' arguments (number of pids') must be specified.");
+	_must(nvalue > 0, "At least 1MB must be written");
+
+	args->n = atoi(nvalue);
 }
 
 void
 write_to_disk(int count)
 {
 	FILE* f = fopen("disk-out.txt", "w");
-	char file_buffer[CHUNK_SIZE + 64];
-	int buffer_count = 0;
-	int i = 0;
+	char file_buffer[CHUNK_SIZE] = { 0 };
+	unsigned long writes = count * MB(1) / CHUNK_SIZE;
 
-	while (i < count) {
-		buffer_count += sprintf(&file_buffer[buffer_count],
-		                        "%d %d %d\n", 1234, 5678, 9012);
-		i++;
-
-		if (buffer_count >= CHUNK_SIZE) {
-			fwrite(file_buffer, buffer_count, 1, f);
-			buffer_count = 0;
-		}
+	while (writes-- > 0) {
+		fwrite(file_buffer, CHUNK_SIZE, 1, f);
 	}
 
-	if (buffer_count > 0) {
-		fwrite(file_buffer, 1, buffer_count, f);
-	}
 	fclose(f);
 }
 
