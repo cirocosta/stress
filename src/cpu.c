@@ -1,13 +1,13 @@
 #include "./common.h"
 
-const char* USAGE = "\n\
-  Description:\n\
-    Runs infinite loop on N processes.\n\
-\n\
-  Usage:\n\
-    cpu -n <number of processes>\n\
-\n\
-";
+/**
+ * Description:
+ *   Loads CPUS with a bunch of usage.
+ *
+ * Usage
+ *   cpu -n <number of processes to fork>
+ *
+ */
 
 void
 start_workers(int n)
@@ -17,7 +17,7 @@ start_workers(int n)
 	while (n--) {
 		switch (pid = fork()) {
 			case -1:
-				_must(0, "Fork returned -1.");
+				_stress_must(0, "Fork returned -1.");
 				break;
 			case 0:
 				printf("[%d] - child started\n", n);
@@ -31,11 +31,12 @@ start_workers(int n)
 int
 main(int argc, char** argv)
 {
-	args_t args = { 0 };
+	stress_args_t args = { 0 };
 
-	parse_args(argc, argv, &args);
+	setbuf(stdout, NULL);
+	stress_parse_args(argc, argv, &args);
 	start_workers(args.n);
-	wait_until_signalized();
+	stress_wait_until_signalized();
 
 	return 0;
 }

@@ -1,22 +1,22 @@
 #include "./common.h"
 
-#define CHUNK_SIZE KB(4)
+#define CHUNK_SIZE _STRESS_KB(4)
 
-const char* USAGE = "\n\
-  Description:\n\
-    Writes stuff to the disk.\n\
-\n\
-  Usage:\n\
-    disk -n <number of megabytes>\n\
-\n\
-";
+/**
+ * Description:
+ *   Writes stuff to the disk.
+ *
+ * Usage
+ *   disk -n <number of megabytes>
+ *
+ */
 
 void
 write_to_disk(int count)
 {
 	FILE* f = fopen("disk-out.txt", "w");
 	char file_buffer[CHUNK_SIZE] = { 0 };
-	unsigned long writes = count * MB(1) / CHUNK_SIZE;
+	unsigned long writes = count * _STRESS_MB(1) / CHUNK_SIZE;
 
 	while (writes-- > 0) {
 		fwrite(file_buffer, CHUNK_SIZE, 1, f);
@@ -28,11 +28,12 @@ write_to_disk(int count)
 int
 main(int argc, char** argv)
 {
-	args_t args = { 0 };
+	stress_args_t args = { 0 };
 
-	parse_args(argc, argv, &args);
+	setbuf(stdout, NULL);
+	stress_parse_args(argc, argv, &args);
 	write_to_disk(args.n);
-	wait_until_signalized();
+	stress_wait_until_signalized();
 
 	return 0;
 }
