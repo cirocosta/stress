@@ -8,7 +8,6 @@ image:
 
 fmt:
 	find . -name "*.c" -o -name "*.h" | xargs clang-format -style=file -i
-	find . -name "*.go" | xargs gofmt -s -w
 
 clean:
 	find . -name "*.out" -type f -delete
