@@ -11,6 +11,7 @@
 - [pid](#pid)
   - [Example](#example-2)
 - [disk](#disk)
+  - [Example](#example-3)
 - [LICENSE](#license)
 
 ## cpu
@@ -95,6 +96,9 @@ Tries to write `n` MBs of data to a file (`disk-out.txt`).
 
 Arguments:
 - `-n` number of MBs to write to the file
+
+
+### Example
 
 ```
 docker run --rm cirocosta/stress disk -n 1024  
