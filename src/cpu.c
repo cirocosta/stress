@@ -1,24 +1,29 @@
 #include "./common.h"
 
-const char* USAGE = "Usage:\n\
-  pid -n <number-of-pids>\n\
+const char* USAGE = "\n\
+  Description:\n\
+    Runs infinite loop on N processes.\n\
+\n\
+  Usage:\n\
+    cpu -n <number of processes>\n\
+\n\
 ";
 
 void
-fork_so_much(int n)
+start_workers(int n)
 {
 	int pid;
 
-	printf("Starting to spawn %d blocking children\n", n);
-	while (--n) {
+	while (n--) {
 		switch (pid = fork()) {
 			case -1:
 				_must(0, "Fork returned -1.");
 				break;
 			case 0:
-				printf("[%d] - blocking\n", n);
-				wait_until_signalized();
-				return;
+				printf("[%d] - child started\n", n);
+				while (1) {
+				}
+				break;
 		}
 	}
 }
@@ -29,7 +34,7 @@ main(int argc, char** argv)
 	args_t args = { 0 };
 
 	parse_args(argc, argv, &args);
-	fork_so_much(args.n);
+	start_workers(args.n);
 	wait_until_signalized();
 
 	return 0;

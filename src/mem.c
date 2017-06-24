@@ -1,35 +1,31 @@
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "./common.h"
 
-#define MEGABYTE 1 << 20
+void
+allocate_memory(int n)
+{
+	const unsigned int chunksize = MB(1);
+	void* alloc_mem_p;
+
+	printf("%d MB will be allocated\n", n);
+	while (n-- > 0) {
+		alloc_mem_p = malloc(chunksize);
+
+		_must(alloc_mem_p, "Couldn't allocate.");
+		memset(alloc_mem_p, 0, chunksize);
+
+		printf("%d MB remaining.\n", n);
+	}
+}
 
 int
 main(int argc, char** argv)
 {
-	void* alloc_mem_p;
-	int megabytes_remaining = 50;
+	args_t args = { 0 };
 
-	if (argc > 1) {
-		_must(is_num(argv[1]),
-		      "Argument must be an int (# of MB to allocate)");
-		megabytes_remaining = atoi(argv[1]);
-	}
+	setbuf(stdout, NULL);
+	parse_args(argc, argv, &args);
+	allocate_memory(args.n);
+	wait_until_signalized();
 
-	printf("Starting. Will allocated %d MB\n", megabytes_remaining);
-
-	while (megabytes_remaining-- > 0) {
-		alloc_mem_p = malloc(MEGABYTE);
-
-		_must(alloc_mem_p, "Couldn't allocate a megabyte.");
-		memset(alloc_mem_p, 0, MEGABYTE);
-
-		printf("%d MB remaining.\n", megabytes_remaining);
-	}
-
-	printf("Done!\n");
-	exit(0);
+	return 0;
 }
