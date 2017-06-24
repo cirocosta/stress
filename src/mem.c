@@ -13,17 +13,17 @@ void
 allocate_memory(int n)
 {
 	const unsigned int chunksize = _STRESS_MB(1);
-	void* alloc_mem_p;
+	int i = 0;
+	void* p;
 
 	printf("%d MB will be allocated\n", n);
-	while (n-- > 0) {
-		alloc_mem_p = malloc(chunksize);
-
-		_STRESS_MUST(alloc_mem_p, "Couldn't allocate.");
-		memset(alloc_mem_p, 0, chunksize);
-
-		printf("%d MB remaining.\n", n);
+	for (; i++ < n;) {
+		_STRESS_MUST((p = malloc(chunksize * sizeof(char))),
+		             "Couldn't allocate.");
+		memset(p, 0xA, chunksize);
+		printf("\rAllocated: %d", i);
 	}
+	printf("\nDone.");
 }
 
 int

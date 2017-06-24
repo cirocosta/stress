@@ -2,68 +2,64 @@
 
 > Collection of tools to stress a machine (cpu, mem, pid, disk).
 
-
 ## cpu
 
-Runs a minimal stupid while loop using `n` goroutines.
-
-Arguments:
-- `-duration`: for how long to run before killing itself (defaults to `1m`);
-- `-goroutines`: number of goroutines to launch (defaults to `runtime.NumCPU()` - see [pkg/runtime](https://golang.org/pkg/runtime/#NumCPU)).
-
+Runs load on `n` processes:
 
 ### Example
 
-For instance, having 8 threads:
-
 ```
-./cpu -duration 2m
+docker run cirocosta/stress cpu -n 3
+[2] - child started
+[1] - child started
+[0] - child started
+[1] Waiting for SIGINT
 
-2017/06/23 17:22:20 launching goroutine 0
-2017/06/23 17:22:20 launching goroutine 1
-2017/06/23 17:22:20 launching goroutine 2
-2017/06/23 17:22:20 launching goroutine 3
-2017/06/23 17:22:20 launching goroutine 4
-2017/06/23 17:22:20 launching goroutine 5
-2017/06/23 17:22:20 launching goroutine 6
-2017/06/23 17:22:20 launching goroutine 7
+docker stats
 
-
-./cpu -duration 2m -goroutines 3
-
-2017/06/23 17:23:31 launching goroutine 0
-2017/06/23 17:23:31 launching goroutine 1
-2017/06/23 17:23:31 launching goroutine 2
-...
-
+CONTAINER      CPU %     MEM USAGE / LIMIT   PIDS
+b391ce600bb4   300.83%   604KiB / 8.759GiB   4
 ```
 
 ## mem 
 
-In a `while` loop, tries to allocate up to `n` MB of memory.
+Tries to allocate up to `n` MB of memory (with actual initialization of the memory).
 
 Arguments:
-- `n` MB of memory to allocate (default: 50MB)
+- `n` MB of memory to allocate
 
 ### Example
 
 ```
-./mem 20
-Starting. Will allocated 20 MB
-19 MB remaining.
-18 MB remaining.
-17 MB remaining.
-...
-2 MB remaining.
-1 MB remaining.
-0 MB remaining.
-Done!
+docker run cirocosta/stress mem -n 1024
+1024 MB will be allocated
+Allocated: 1024
+Done.[1] Waiting for SIGINT
+
+
+docker stats --no-stream
+CONTAINER       CPU %    MEM USAGE / LIMIT     MEM %     PIDS
+40080ad19a1b    0.00%    1.002GiB / 8.759GiB   11.45%    1
+
+
+docker exec 40080ad19a1b pmap -x 1
+1: mem -n 1024
+Address		  Kbytes     PSS   Dirty    Swap  Mode  Mapping
+000055c423976000      24      24       0       0  r-xp  /usr/local/bin/mem
+000055c423b7b000       8       8       8       0  rw-p  /usr/local/bin/mem
+000055c4251e2000 1048576 1048576 1048576       0  rw-p  [heap]
+00007fffaa5c8000     132       8       8       0  rw-p  [stack]
+00007fffaa5eb000       8       0       0       0  r--p  [vvar]
+00007fffaa5ed000       8       0       0       0  r-xp  [vdso]
+ffffffffff600000       4       0       0       0  r-xp  [vsyscall]
+----------------  ------  ------  ------  ------
+total		 1048760 1048616 1048592       0
 ```
 
 
 ## pid
 
-Allocates N processes and then suspends the execution until SIGTERM | SIGINT.
+Allocates N processes and then suspends the execution.
 
 Arguments:
 - `-n` number of PIDS
@@ -71,18 +67,28 @@ Arguments:
 ### Example
 
 ```
-./pid 512
-Starting to spawn 512 blocking children
-[512] - child creted
-[511] - child creted
-...
-[0] - blocking
+docker run cirocosta/stress pid -n 200 
+Starting to spawn 200 blocking children
+[1] Waiting for SIGINT
+
+
+CONTAINER      CPU %    PIDS
+38a9e2d1bae0   0.00%    200
+
 ```
 
 
 ## disk
 
-TODO 
+Tries to write `n` MBs of data to a file (`disk-out.txt`).
+
+Arguments:
+- `-n` number of MBs to write to the file
+
+```
+docker run --rm cirocosta/stress disk -n 1024  
+-rw-r--r--    1 root     root        1.0G Jun 24 17:50 disk-out.txt
+```
 
 
 ## Docker

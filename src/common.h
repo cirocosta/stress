@@ -65,8 +65,7 @@ stress_parse_args(int argc, char** argv, stress_args_t* args)
 		}
 	}
 
-	_STRESS_MUST(nvalue,
-	             "'n' arguments (number of pids') must be specified.");
+	_STRESS_MUST(nvalue, "argument '-n' must be specified.");
 	_STRESS_MUST(nvalue > 0, "At least 1MB must be written");
 
 	args->n = atoi(nvalue);
