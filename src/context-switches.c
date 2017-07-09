@@ -1,11 +1,7 @@
 #define _GNU_SOURCE
-#include "./common.h"
-#include <pthread.h>
-#include <sched.h>
-#include <stdlib.h>
-#include <time.h>
-
 #define NTHREADS 50
+
+#include "./common.h"
 
 int
 stick_self_to_core(int cpu)
