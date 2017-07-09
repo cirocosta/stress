@@ -14,6 +14,9 @@
   - [Example](#example-3)
 - [files](#files)
   - [Example](#example-4)
+- [context-switches](#context-switches)
+  - [Example](#example-5)
+
 - [LICENSE](#license)
 
 ## cpu
@@ -126,6 +129,31 @@ file10  file13  file17  file20  file24  file28  file31  file35  file39  file42  
 file100 file14  file18  file21  file25  file29  file32  file36  file4   file43  file47  file50  file54  file58  file61  file65  file69  file72  file76  file8   file83  file87  file90  file94  file98
 file11  file15  file19  file22  file26  file3   file33  file37  file40  file44  file48  file51  file55  file59  file62  file66  file7   file73  file77  file80  file84  file88  file91  file95  file99
 ```
+
+## context-switches
+
+Creates `50` threads which rotate between `n` CPUs executing, in a ring-buffer manner, cpu sticking and execution of dumb `while` loops.
+
+Arguments:
+- none
+
+
+### Example
+
+```
+docker run --rm cirocosta/stress context-switches
+ls ./stress-files
+
+file1   file12  file16  file2   file23  file27  file30  file34  file38  file41  file45  file49  file52  file56  file6   file63  file67  file70  file74  file78  file81  file85  file89  file92  file96
+file10  file13  file17  file20  file24  file28  file31  file35  file39  file42  file46  file5   file53  file57  file60  file64  file68  file71  file75  file79  file82  file86  file9   file93  file97
+file100 file14  file18  file21  file25  file29  file32  file36  file4   file43  file47  file50  file54  file58  file61  file65  file69  file72  file76  file8   file83  file87  file90  file94  file98
+file11  file15  file19  file22  file26  file3   file33  file37  file40  file44  file48  file51  file55  file59  file62  file66  file7   file73  file77  file80  file84  file88  file91  file95  file99
+```
+
+
+This leads to:
+
+![image](https://user-images.githubusercontent.com/3574444/27996167-b6053f3c-64b2-11e7-9c07-6240f147c0eb.png)
 
 
 ## LICENSE

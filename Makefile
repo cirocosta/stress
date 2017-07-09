@@ -3,6 +3,10 @@ HEADERS		:=	$(shell find . -name '*.h')
 
 binaries: $(addsuffix .out, $(basename $(SRC)))
 
+build-env:
+	docker build -f ./Dockerfile.build -t cirocosta/stress:build .
+	docker run -it -v $(shell pwd):/cwd cirocosta/stress:build /bin/sh
+
 image:
 	docker build -t cirocosta/stress .
 
@@ -15,4 +19,4 @@ clean:
 %.out: %.c $(HEADERS)
 	gcc ${DOCKER_GCC_OPTS} -Ofast $< -o $@
 
-.PHONY: image fmt
+.PHONY: image fmt build-env

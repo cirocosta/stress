@@ -5,7 +5,6 @@ RUN DOCKER_GCC_OPTS=--static make binaries -j4 \
     && find . -name "*.out" -exec basename {} .out \; \
     | xargs -i cp src/{}.out /bin/{}
 
-
 FROM busybox
 COPY --from=builder /bin /usr/local/bin
 
