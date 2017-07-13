@@ -26,6 +26,7 @@ thread_handler(void* arg)
 	char file_buffer[CHUNK_SIZE] = { 0 };
 	unsigned long writes = targ->count * _STRESS_MB(1) / CHUNK_SIZE;
 
+	memset(file_buffer, 65, CHUNK_SIZE);
 	while (writes-- > 0) {
 		_STRESS_MUST(write(targ->fd, file_buffer, CHUNK_SIZE) != -1,
 		             "Couldn't properly write chunk to fd %d",
