@@ -3,6 +3,15 @@
 
 #include "./common.h"
 
+#if defined(__APPLE__) && defined(__MACH__)
+int
+main()
+{
+	printf("ERROR: 'context-switches' is Linux only. Aborting.\n");
+	exit(1);
+}
+#else
+
 int
 stick_self_to_core(int cpu)
 {
@@ -57,3 +66,5 @@ main()
 
 	return 0;
 }
+
+#endif
