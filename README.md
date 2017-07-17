@@ -102,6 +102,7 @@ Tries to write `n` MBs of data to a file (`disk-out.txt`).
 Arguments:
 - `-n` number of MBs to write to the file
 - `-f` name of the file
+- `-b` block after writing (optional)
 
 
 ### Example

@@ -9,6 +9,9 @@
  * Usage
  *   disk -n <number of megabytes>
  *
+ * Arguments:
+ *   -n         number of megabytes
+ *   -b         block after running
  */
 
 void
@@ -36,7 +39,8 @@ main(int argc, char** argv)
 	_STRESS_MUST(strlen(args.f), "a filename must be specified");
 
 	write_to_disk(args.f, args.n);
-	stress_wait_until_signalized();
 
+	if (args.b)
+		stress_wait_until_signalized();
 	return 0;
 }
