@@ -14,7 +14,6 @@
 typedef struct thread_arg_t {
 	char* filename;
 	int count;
-	int threadnum;
 } thread_arg_t;
 
 void*
@@ -55,16 +54,9 @@ int
 main(int argc, char** argv)
 {
 	stress_args_t args = { 0 };
-	thread_arg_t stdout_arg = {.count = 0,
-		                   .threadnum = 0,
-		                   .filename = "file1" };
-	thread_arg_t stderr_arg = {.count = 0,
-		                   .threadnum = 1,
-		                   .filename = "file2" };
+	thread_arg_t stdout_arg = {.count = 0, .filename = "file1" };
+	thread_arg_t stderr_arg = {.count = 0, .filename = "file2" };
 	pthread_t threads[2];
-
-	setbuf(stdout, NULL);
-	setbuf(stderr, NULL);
 
 	stress_parse_args(argc, argv, &args);
 
@@ -85,8 +77,6 @@ main(int argc, char** argv)
 
 	_STRESS_MUST((!pthread_join(threads[1], NULL)),
 	             "Unexpected error waiting for stderr thread");
-
-	stress_wait_until_signalized();
 
 	return 0;
 }
