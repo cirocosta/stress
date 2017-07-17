@@ -150,6 +150,27 @@ This leads to:
 ![image](https://user-images.githubusercontent.com/3574444/27996167-b6053f3c-64b2-11e7-9c07-6240f147c0eb.png)
 
 
+## write
+
+Creates 2 threads which are responsible for `write` & `lseek` forever in two files by writing `n` MBs to each file.
+
+Arguments:
+- `n` - size of the files (MB)
+
+
+### Example
+
+
+```
+docker run --rm cirocosta/stress write -n 1
+
+
+
+CONTAINER           CPU %         ...       BLOCK I/O           PIDS
+d809a7dee8c6        5.22%         ...       0B / 3.78GB         1
+```
+
+
 ## LICENSE
 
 MIT

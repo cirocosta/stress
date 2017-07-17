@@ -24,10 +24,11 @@ thread_handler(void* arg)
 	unsigned long writes = targ->count * _STRESS_MB(1) / CHUNK_SIZE;
 	int i = writes;
 	FILE* fp;
-	int fd = fileno(fp);
 
 	_STRESS_MUST((fp = fopen(targ->filename, "w+")),
 	             "Couldn't create file %s", targ->filename);
+
+	int fd = fileno(fp);
 
 	while (1) {
 		memset(file_buffer, rand() % 255, CHUNK_SIZE);
@@ -54,22 +55,22 @@ int
 main(int argc, char** argv)
 {
 	stress_args_t args = { 0 };
-	thread_arg_t stdout_arg = {.count = 0, .filename = "file1" };
-	thread_arg_t stderr_arg = {.count = 0, .filename = "file2" };
+	thread_arg_t thread1arg = {.count = 0, .filename = "file1" };
+	thread_arg_t thread2arg = {.count = 0, .filename = "file2" };
 	pthread_t threads[2];
 
 	stress_parse_args(argc, argv, &args);
 
-	stdout_arg.count = args.n;
-	stderr_arg.count = args.n;
+	thread1arg.count = args.n;
+	thread2arg.count = args.n;
 
 	srand(time(NULL));
 
 	_STRESS_MUST(
-	  (!pthread_create(&threads[0], NULL, &thread_handler, &stdout_arg)),
+	  (!pthread_create(&threads[0], NULL, &thread_handler, &thread1arg)),
 	  "Unexpected error creating stdout thread");
 	_STRESS_MUST(
-	  (!pthread_create(&threads[1], NULL, &thread_handler, &stderr_arg)),
+	  (!pthread_create(&threads[1], NULL, &thread_handler, &thread2arg)),
 	  "Unexpected error creating stderr thread");
 
 	_STRESS_MUST((!pthread_join(threads[0], NULL)),
