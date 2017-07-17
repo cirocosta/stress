@@ -12,9 +12,9 @@
  */
 
 void
-write_to_disk(int count)
+write_to_disk(char* filename, int count)
 {
-	FILE* f = fopen("disk-out.txt", "w");
+	FILE* f = fopen(filename, "w");
 	char file_buffer[CHUNK_SIZE] = { 0 };
 	unsigned long writes = count * _STRESS_MB(1) / CHUNK_SIZE;
 
@@ -32,7 +32,10 @@ main(int argc, char** argv)
 
 	setbuf(stdout, NULL);
 	stress_parse_args(argc, argv, &args);
-	write_to_disk(args.n);
+
+	_STRESS_MUST(strlen(args.f), "a filename must be specified");
+
+	write_to_disk(args.f, args.n);
 	stress_wait_until_signalized();
 
 	return 0;

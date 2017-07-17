@@ -18,6 +18,7 @@
 #define _STRESS_MB(x) ((size_t)(x) << 20)
 #define _STRESS_TRUE 1
 #define _STRESS_FALSE 0
+#define ARG_VALUE_MAX 256
 
 #define _STRESS_MUST(condition, message, ...)                                  \
 	do {                                                                   \
@@ -48,32 +49,38 @@ stress_is_num(char str[])
 
 typedef struct args_t {
 	int n;
+	char f[FILENAME_MAX];
 } stress_args_t;
 
 void
 stress_parse_args(int argc, char** argv, stress_args_t* args)
 {
-	char* nvalue = NULL;
+	char* fvalue = NULL;
 	int pids = 0;
 	int c;
+	size_t arglen = 0;
 
 	_STRESS_MUST(argc > 1, "%s\n", "Argument -n must be specified.");
 
 	opterr = 0;
-	while ((c = getopt(argc, argv, "n:")) != -1) {
+	while ((c = getopt(argc, argv, "f:n:")) != -1) {
 		switch (c) {
 			case 'n':
-				nvalue = optarg;
-				_STRESS_MUST(stress_is_num(nvalue),
-				             "Argument (n) must be an int");
+				_STRESS_MUST(stress_is_num(optarg),
+				             "Argument (n=%s) must be an int",
+				             optarg);
+				args->n = atoi(optarg);
+				break;
+			case 'f':
+				arglen = strlen(optarg);
+				_STRESS_MUST(arglen < ARG_VALUE_MAX,
+				             "-f option can't take more than "
+				             "%d characters",
+				             ARG_VALUE_MAX);
+				strncpy(args->f, optarg, arglen);
 				break;
 		}
 	}
-
-	_STRESS_MUST(nvalue, "argument '-n' must be specified.");
-	_STRESS_MUST(nvalue > 0, "At least 1MB must be written");
-
-	args->n = atoi(nvalue);
 }
 
 void

@@ -101,12 +101,13 @@ Tries to write `n` MBs of data to a file (`disk-out.txt`).
 
 Arguments:
 - `-n` number of MBs to write to the file
+- `-f` name of the file
 
 
 ### Example
 
 ```
-docker run --rm cirocosta/stress disk -n 1024  
+docker run --rm cirocosta/stress disk -n 1024 -f ./disk-out.txt
 -rw-r--r--    1 root     root        1.0G Jun 24 17:50 disk-out.txt
 ```
 
