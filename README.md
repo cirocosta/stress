@@ -157,6 +157,7 @@ Creates 2 threads which are responsible for `write` & `lseek` forever in two fil
 
 Arguments:
 - `n` - size of the files (MB)
+- `d` - base directory to write files to
 
 
 ### Example

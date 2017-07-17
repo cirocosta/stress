@@ -47,9 +47,25 @@ stress_is_num(char str[])
 	return _STRESS_TRUE;
 }
 
+/**
+ * stress_args_t represents arguments that are set
+ * to be parsed from CLI.
+ *
+ *      -b      whether to block or not
+ *      -n      a number of something
+ *      -d      base directory
+ *      -f      filename
+ *
+ * None of them are required by default (that's
+ * something to be enforced at a higher level).
+ *
+ * Note.: type is enforced.
+ */
 typedef struct args_t {
 	int n;
+	char b;
 	char f[FILENAME_MAX];
+	char d[FILENAME_MAX];
 } stress_args_t;
 
 void
@@ -58,12 +74,21 @@ stress_parse_args(int argc, char** argv, stress_args_t* args)
 	char* fvalue = NULL;
 	int pids = 0;
 	int c;
-	size_t arglen = 0;
+	size_t arglen;
 
 	_STRESS_MUST(argc > 1, "%s\n", "Argument -n must be specified.");
 
 	opterr = 0;
-	while ((c = getopt(argc, argv, "f:n:")) != -1) {
+	while ((c = getopt(argc, argv, "bd:f:n:")) != -1) {
+		arglen = 0;
+		if (optarg != NULL) {
+			arglen = strlen(optarg);
+			_STRESS_MUST(arglen < ARG_VALUE_MAX,
+			             "-f option can't take more than "
+			             "%d characters",
+			             ARG_VALUE_MAX);
+		}
+
 		switch (c) {
 			case 'n':
 				_STRESS_MUST(stress_is_num(optarg),
@@ -71,13 +96,14 @@ stress_parse_args(int argc, char** argv, stress_args_t* args)
 				             optarg);
 				args->n = atoi(optarg);
 				break;
+			case 'b':
+				args->b = 1;
+				break;
 			case 'f':
-				arglen = strlen(optarg);
-				_STRESS_MUST(arglen < ARG_VALUE_MAX,
-				             "-f option can't take more than "
-				             "%d characters",
-				             ARG_VALUE_MAX);
 				strncpy(args->f, optarg, arglen);
+				break;
+			case 'd':
+				strncpy(args->d, optarg, arglen);
 				break;
 		}
 	}
