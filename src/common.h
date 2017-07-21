@@ -1,6 +1,10 @@
 #ifndef STRESS__COMMON_H
 #define STRESS__COMMON_H
 
+#ifdef __linux__
+#define _GNU_SOURCE
+#endif
+
 #include <ctype.h>
 #include <errno.h>
 #include <pthread.h>
@@ -112,7 +116,7 @@ stress_parse_args(int argc, char** argv, stress_args_t* args)
 void
 stress_handle_sigint(int signum)
 {
-	printf("SIGINT received.\n");
+	printf("Signal (%d) received.\n", signum);
 }
 
 void

@@ -30,7 +30,6 @@ void
 create_files(int n)
 {
 	struct stat st = { 0 };
-	const unsigned int chunksize = _STRESS_MB(1);
 	int i = 0;
 
 	printf("creating directory for files at '%s'\n", files_directory);

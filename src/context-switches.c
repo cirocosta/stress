@@ -25,6 +25,7 @@ stick_self_to_core(int cpu)
 void*
 thread_handler(void* arg)
 {
+	(void)arg;
 	int num_cores = sysconf(_SC_NPROCESSORS_ONLN);
 
 	while (1) {
@@ -32,7 +33,6 @@ thread_handler(void* arg)
 		int ndx = 0;
 
 		while (++ndx < num_cores) {
-			int core = r + ndx % num_cores;
 			int n = 1000;
 			_STRESS_MUST((stick_self_to_core(r) != -1),
 			             "couldn't stick thread to cpu %d", ndx);
