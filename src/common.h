@@ -75,8 +75,6 @@ typedef struct args_t {
 void
 stress_parse_args(int argc, char** argv, stress_args_t* args)
 {
-	char* fvalue = NULL;
-	int pids = 0;
 	int c;
 	size_t arglen;
 
@@ -129,6 +127,70 @@ stress_wait_until_signalized()
 
 	printf("[%d] Waiting for SIGINT\n", getpid());
 	sleep(36000);
+}
+
+/**
+ * Tries to write 'n' bytes from a 'vptr' to a
+ * file descriptor indicated by 'fd'.
+ */
+ssize_t
+stress_write_n(int fd, const void* vptr, size_t n)
+{
+	size_t nleft;
+	ssize_t nwritten;
+	const char* ptr;
+
+	ptr = vptr;
+	nleft = n;
+
+	while (nleft > 0) {
+		nwritten = write(fd, ptr, nleft);
+		if (nwritten < 0) {
+			if (errno == EINTR) {
+				nwritten = 0;
+				break;
+			}
+
+			return nwritten;
+		}
+
+		nleft -= nwritten;
+		ptr += nwritten;
+	}
+
+	return n - nleft;
+}
+
+/**
+ * Tries to read 'n' bytes from a file descriptor
+ * 'fd' to a buffer indicated by 'vptr'.
+ */
+ssize_t
+stress_read_n(int fd, void* vptr, size_t n)
+{
+	size_t nleft;
+	ssize_t nread;
+	char* ptr;
+
+	ptr = vptr;
+	nleft = n;
+
+	while (nleft > 0) {
+		nread = read(fd, ptr, nleft);
+		if (nread < 0) {
+			if (errno == EINTR) {
+				nread = 0;
+				break;
+			}
+
+			return nread;
+		}
+
+		nleft -= nread;
+		ptr += nread;
+	}
+
+	return n - nleft;
 }
 
 #endif // ! STRESS_COMMON_H
