@@ -17,26 +17,27 @@
 void
 str_echo(int sockfd)
 {
-	ssize_t wn;
 	ssize_t rn;
 	char buf[MAXLINE];
 
 	while ((rn = read(sockfd, buf, MAXLINE)) > 0) {
 		_STRESS_MUST(rn >= 0, "unexpected error reading");
-
-		while ((wn = write(sockfd, buf, rn)) > 0) {
-			_STRESS_MUST(wn >= 0, "unexpected error writing");
-		}
+		_STRESS_MUST(stress_write_n(sockfd, buf, rn) > 0,
+		             "couldn't write back data sent");
 	}
+}
+
+void
+terminate(int dummy)
+{
+	(void)(dummy);
+	exit(0);
 }
 
 int
 main(int argc, char** argv)
 {
 	stress_args_t args = {.b = 0 };
-
-	setbuf(stdout, NULL);
-	stress_parse_args(argc, argv, &args);
 
 	int listen_fd;
 	int conn_fd;
@@ -45,6 +46,11 @@ main(int argc, char** argv)
 	socklen_t client_len;
 	struct sockaddr_in client_addr;
 	struct sockaddr_in server_addr;
+
+	signal(SIGINT, terminate);
+
+	setbuf(stdout, NULL);
+	stress_parse_args(argc, argv, &args);
 
 	listen_fd = socket(AF_INET, SOCK_STREAM, 0);
 

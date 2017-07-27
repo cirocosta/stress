@@ -173,6 +173,27 @@ CONTAINER           CPU %         ...       BLOCK I/O           PIDS
 d809a7dee8c6        5.22%         ...       0B / 3.78GB         1
 ```
 
+## tcp
+
+Separated in two binaries (tcp-server and tcp-client) it simply starts a TCP echo server in one side and in the order contiguously sends and reads chunks of 4KB.
+
+Arguments:
+- `-f` ip where the server lives (client only)
+- `-n` port (client and server)
+
+
+### Example
+
+```
+docker run --rm --network host cirocosta/stress tcp-client -f 127.0.0.1 -n 1337
+docker run --rm --network host cirocosta/stress tcp-server -n 1337
+
+
+# after some seconds:
+CONTAINER       ..    NET I/O             BLOCK I/O     PIDS
+fd1df18bd1e9    ..    3.25GB / 3.25GB     0B / 0B       2
+```
+
 
 ## LICENSE
 
