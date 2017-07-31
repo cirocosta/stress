@@ -1,4 +1,5 @@
 #include "./common.h"
+#include "./http_data.h"
 #include <errno.h>
 #include <fcntl.h>
 #include <netdb.h>
@@ -63,7 +64,7 @@ create_and_bind(char* port)
 	hints.ai_socktype = SOCK_STREAM; // TCP
 	hints.ai_flags = AI_PASSIVE;     // All Ifaces
 
-	_STRESS_MUST((s = getaddrinfo(NULL, port, &hints, &result)),
+	_STRESS_MUST((s = getaddrinfo(NULL, port, &hints, &result)) == 0,
 	             "Couldn't get addr info - %s", gai_strerror(s));
 
 	for (rp = result; rp != NULL; rp = rp->ai_next) {
@@ -127,7 +128,7 @@ main(int argc, char* argv[])
 	               "Couldn't create epoll fd");
 
 	event.data.fd = sfd;
-	event.events = EPOLLIN | EPOLLET; // wait for read; be edge-triggered
+	event.events = EPOLLIN | EPOLLET;
 
 	_STRESS_MUST_P((s = epoll_ctl(efd, EPOLL_CTL_ADD, sfd, &event)) != -1,
 	               "epoll_ctl", "Couldn't set events data for epoll");
@@ -144,9 +145,7 @@ main(int argc, char* argv[])
 			if ((events[i].events & EPOLLERR) ||
 			    (events[i].events & EPOLLHUP) ||
 			    (!(events[i].events & EPOLLIN))) {
-				// An error has occured on this fd, or the
-				// socket is not ready for reading.
-				fprintf(stderr, "epoll error\n");
+				fprintf(stderr, "Unexpected epoll error\n");
 				close(events[i].data.fd);
 				continue;
 			}
@@ -158,35 +157,22 @@ main(int argc, char* argv[])
 					struct sockaddr in_addr;
 					socklen_t in_len;
 					int infd;
-					char hbuf[NI_MAXHOST];
-					char sbuf[NI_MAXSERV];
 
 					in_len = sizeof in_addr;
 					infd = accept(sfd, &in_addr, &in_len);
 					if (infd == -1) {
+						// All incoming
+						// connections
+						// have been processed.
 						if ((errno == EAGAIN) ||
 						    (errno == EWOULDBLOCK)) {
-							/* We have processed all
-							   incoming
-							   connections. */
-							break;
-						} else {
-							perror("accept");
 							break;
 						}
-					}
 
-					// TODO remove this.
-					// It's unnecesary to get the name
-					s = getnameinfo(
-					  &in_addr, in_len, hbuf, sizeof hbuf,
-					  sbuf, sizeof sbuf,
-					  NI_NUMERICHOST | NI_NUMERICSERV);
-					if (s == 0) {
-						printf("Accepted connection on "
-						       "descriptor %d "
-						       "(host=%s, port=%s)\n",
-						       infd, hbuf, sbuf);
+						_STRESS_MUST_P(
+						  0, "accept",
+						  "Unexpected error accepting "
+						  "connection");
 					}
 
 					// Make the incoming socket non-blocking
@@ -196,13 +182,13 @@ main(int argc, char* argv[])
 
 					event.data.fd = infd;
 					event.events = EPOLLIN | EPOLLET;
-					s = epoll_ctl(efd, EPOLL_CTL_ADD, infd,
-					              &event);
-					if (s == -1) {
-						perror("epoll_ctl");
-						abort();
-					}
+					_STRESS_MUST_P(
+					  (s = epoll_ctl(efd, EPOLL_CTL_ADD,
+					                 infd, &event)) != -1,
+					  "epoll_ctl", "Couldn't make client "
+					               "fd be monitored");
 				}
+
 				continue;
 			}
 
@@ -217,15 +203,16 @@ main(int argc, char* argv[])
 
 				while (1) {
 					ssize_t count;
-					char buf[512];
+					ssize_t written;
+					char buf[128]; // dumb buffer
 
 					// TODO use recv such that we can
 					// count but drop the entirity of the
 					// content. This allows us to avoid
 					// copying from kernel space to
 					// userspace.
-					count = read(events[i].data.fd, buf,
-					             sizeof buf);
+					count = recv(events[i].data.fd, buf,
+					             sizeof buf, MSG_TRUNC);
 					if (count == -1) {
 						// We have read all data.
 						// Go back to the main loop.
@@ -240,12 +227,15 @@ main(int argc, char* argv[])
 						break;
 					}
 
-					// TODO write back the data that we
-					// already have in kernel space.
-					s = write(1, buf, count);
-					if (s == -1) {
-						perror("write");
-						abort();
+					written =
+					  write(events[i].data.fd,
+					        stress_http_response,
+					        stress_http_response_len);
+					printf("written: %ld\n", written);
+					if (written == -1) {
+						fprintf(
+						  stderr,
+						  "Unexpected epoll error\n");
 					}
 				}
 
