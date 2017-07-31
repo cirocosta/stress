@@ -22,29 +22,20 @@
  *
  * 2.   modify the flags such that it includes
  *      O_NONBLOCK.
- *
- *      TODO use _STRESS_MUST_P
  */
-static int
+static void
 make_socket_non_blocking(int sfd)
 {
 	int flags;
 	int s;
 
-	flags = fcntl(sfd, F_GETFL, 0);
-	if (flags == -1) {
-		perror("fcntl");
-		return -1;
-	}
+	_STRESS_MUST_P((flags = fcntl(sfd, F_GETFL, 0)) != -1, "fcntl",
+	               "Couldn't retrieve flags from socket file descriptor");
 
 	flags |= O_NONBLOCK;
-	s = fcntl(sfd, F_SETFL, flags);
-	if (s == -1) {
-		perror("fcntl");
-		return -1;
-	}
-
-	return 0;
+	_STRESS_MUST_P(
+	  (s = fcntl(sfd, F_SETFL, flags)) != -1, "fcntl",
+	  "Couldn't set nonblocking flags on socket file descriptor");
 }
 
 /**
@@ -72,16 +63,14 @@ create_and_bind(char* port)
 	hints.ai_socktype = SOCK_STREAM; // TCP
 	hints.ai_flags = AI_PASSIVE;     // All Ifaces
 
-	s = getaddrinfo(NULL, port, &hints, &result);
-	if (s != 0) {
-		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
-		return -1;
-	}
+	_STRESS_MUST((s = getaddrinfo(NULL, port, &hints, &result)),
+	             "Couldn't get addr info - %s", gai_strerror(s));
 
 	for (rp = result; rp != NULL; rp = rp->ai_next) {
 		sfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
-		if (sfd == -1)
+		if (sfd == -1) {
 			continue;
+		}
 
 		s = bind(sfd, rp->ai_addr, rp->ai_addrlen);
 		if (s == 0) {
@@ -91,14 +80,17 @@ create_and_bind(char* port)
 		close(sfd);
 	}
 
-	if (rp == NULL) {
-		fprintf(stderr, "Could not bind\n");
-		return -1;
-	}
-
+	_STRESS_MUST(rp, "Couldn't bind to port %s", port);
 	freeaddrinfo(result);
 
 	return sfd;
+}
+
+void
+terminate(int dummy)
+{
+	(void)(dummy);
+	exit(0);
 }
 
 /**
@@ -124,39 +116,25 @@ main(int argc, char* argv[])
 		exit(EXIT_FAILURE);
 	}
 
+	signal(SIGINT, terminate);
+
 	sfd = create_and_bind(argv[1]);
-	if (sfd == -1)
-		abort();
+	make_socket_non_blocking(sfd);
 
-	s = make_socket_non_blocking(sfd);
-	if (s == -1)
-		abort();
-
-	s = listen(sfd, SOMAXCONN);
-	if (s == -1) {
-		perror("listen");
-		abort();
-	}
-
-	efd = epoll_create1(0);
-	if (efd == -1) {
-		perror("epoll_create");
-		abort();
-	}
+	_STRESS_MUST_P((s = listen(sfd, SOMAXCONN)) != -1, "listen",
+	               "couldn't make socket fd listen.");
+	_STRESS_MUST_P((efd = epoll_create1(0)) != -1, "epoll_create1",
+	               "Couldn't create epoll fd");
 
 	event.data.fd = sfd;
 	event.events = EPOLLIN | EPOLLET; // wait for read; be edge-triggered
-	s = epoll_ctl(efd, EPOLL_CTL_ADD, sfd, &event);
-	if (s == -1) {
-		perror("epoll_ctl");
-		abort();
-	}
 
-	// Buffer where events are returned
-	events = calloc(MAXEVENTS, sizeof event);
+	_STRESS_MUST_P((s = epoll_ctl(efd, EPOLL_CTL_ADD, sfd, &event)) != -1,
+	               "epoll_ctl", "Couldn't set events data for epoll");
 
-	// TODO use an event loop per thread.
-	// The ev loop
+	_STRESS_MUST((events = calloc(MAXEVENTS, sizeof event)),
+	             "couldn't allocate memory for epoll evs");
+
 	while (1) {
 		int n;
 		int i;
@@ -211,12 +189,10 @@ main(int argc, char* argv[])
 						       infd, hbuf, sbuf);
 					}
 
-					/* Make the incoming socket non-blocking
-					   and add it to the
-					   list of fds to monitor. */
-					s = make_socket_non_blocking(infd);
-					if (s == -1)
-						abort();
+					// Make the incoming socket non-blocking
+					// and add it to the list of fds to
+					// monitor.
+					make_socket_non_blocking(infd);
 
 					event.data.fd = infd;
 					event.events = EPOLLIN | EPOLLET;
