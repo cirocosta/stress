@@ -5,6 +5,7 @@ flags = [
 '-Wall',
 '-Wextra',
 '-Werror',
+'-Wno-missing-field-initializers',
 '-fexceptions',
 '-DNDEBUG',
 '-std=c99',
