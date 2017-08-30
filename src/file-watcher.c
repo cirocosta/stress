@@ -20,11 +20,10 @@
 static const char files_directory[] = "./stress-files";
 
 void
-create_file_and_watch(const char* base, const int i, int fd)
+create_file(const char* base, const int i)
 {
 	FILE* fp;
 	char* filename;
-        int wd;
 
 	_STRESS_MUST(asprintf(&filename, "%s/file%d", base, i) > 0,
 	             "Couldn't create name for file %d", i);
@@ -33,7 +32,6 @@ create_file_and_watch(const char* base, const int i, int fd)
 	fprintf(fp, "dummy");
 	fclose(fp);
 
-	wd = inotify_add_watch(fd, files_directory, IN_CREATE);
 	free(filename);
 }
 
@@ -42,6 +40,7 @@ create_files_and_watch(int n, int fd)
 {
 	struct stat st = { 0 };
 	int i = 0;
+	int wd;
 
 	_STRESS_INFO("creating directory for files at '%s'", files_directory);
 
@@ -54,17 +53,24 @@ create_files_and_watch(int n, int fd)
 	_STRESS_INFO("%d files will be created", n);
 
 	while (i++ < n) {
-		create_file_and_watch(files_directory, i, fd);
+		create_file(files_directory, i);
 	}
 
 	_STRESS_INFO("Finished creating files and their watches");
+	_STRESS_INFO("Adding watch to directory");
+
+	_STRESS_MUST_P(
+	  (wd = inotify_add_watch(fd, files_directory,
+	                          IN_CREATE | IN_MODIFY | IN_DELETE)) >= 0,
+	  "inotify_add_watch", "couldn't add watch for directory %s",
+	  files_directory);
 }
 
 int
 main(int argc, char** argv)
 {
 	stress_args_t args = { 0 };
-        int fd;
+	int fd;
 
 	setbuf(stdout, NULL);
 	stress_parse_args(argc, argv, &args);
