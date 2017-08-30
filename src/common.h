@@ -25,6 +25,13 @@
 #define _STRESS_FALSE 0
 #define ARG_VALUE_MAX 256
 
+#define _STRESS_INFO(message, ...)                                             \
+	do {                                                                   \
+		fprintf(stderr, "[info] ");                                    \
+		fprintf(stderr, message, ##__VA_ARGS__);                       \
+		fprintf(stderr, "\n");                                         \
+	} while (0)
+
 #define _STRESS_MUST(condition, message, ...)                                  \
 	do {                                                                   \
 		if (!(condition)) {                                            \
