@@ -39,22 +39,14 @@ allocate_and_use(int n)
 		_STRESS_MUST((p[i] = malloc(CHUNK_SIZE * sizeof(char))),
 		             "Couldn't allocate.");
 		memset(p[i], randoml26(), CHUNK_SIZE);
-
 		_STRESS_INFO("Allocated 1MB at position %p", p[i]);
 	}
 
 	_STRESS_INFO("Memory allocated.");
-	_STRESS_INFO("Starting bump copying of memory.");
-
-	for (int i = 0; i++ < n;) {
-		_STRESS_INFO("i=%d memory - %p", i, p[i]);
-	}
+	_STRESS_INFO("Starting dumb memory setting.");
 
 	while (1) {
 		for (int i = 0; i++ < n;) {
-			_STRESS_INFO(
-			  "i=%d Changing 1MB of values at position %p", i,
-			  p[i]);
 			memset(p[i], randoml26(), CHUNK_SIZE);
 		}
 	}
