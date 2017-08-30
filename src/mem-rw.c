@@ -16,7 +16,8 @@
  *              performs a read followed by a write.
  */
 
-static char __attribute__((always_inline)) randoml26()
+static inline char
+randoml26()
 {
 	long l;
 	do {
