@@ -1,3 +1,4 @@
 *.out
 *dSYM
 disk-out.txt
+stress-files/
