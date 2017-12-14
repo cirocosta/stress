@@ -37,7 +37,7 @@ terminate(int dummy)
 int
 main(int argc, char** argv)
 {
-	stress_args_t args = {.b = 0 };
+	stress_args_t args = { .b = 0 };
 
 	int listen_fd;
 	int conn_fd;
@@ -64,8 +64,8 @@ main(int argc, char** argv)
 
 	for (;;) {
 		client_len = sizeof(client_addr);
-		conn_fd = accept(listen_fd, (struct sockaddr*)&client_addr,
-		                 &client_len);
+		conn_fd = accept(
+		  listen_fd, (struct sockaddr*)&client_addr, &client_len);
 
 		if ((child_pid = fork()) == 0) {
 			close(listen_fd);

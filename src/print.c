@@ -40,8 +40,8 @@ int
 main(int argc, char** argv)
 {
 	stress_args_t args = { 0 };
-	thread_arg_t stdout_arg = {.count = 0, .fd = STDOUT_FILENO };
-	thread_arg_t stderr_arg = {.count = 0, .fd = STDERR_FILENO };
+	thread_arg_t stdout_arg = { .count = 0, .fd = STDOUT_FILENO };
+	thread_arg_t stderr_arg = { .count = 0, .fd = STDERR_FILENO };
 	pthread_t threads[2];
 
 	setbuf(stdout, NULL);

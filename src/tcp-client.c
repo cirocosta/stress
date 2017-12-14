@@ -43,7 +43,7 @@ terminate(int dummy)
 int
 main(int argc, char** argv)
 {
-	stress_args_t args = {.b = 0 };
+	stress_args_t args = { .b = 0 };
 
 	int sock_fd;
 	struct sockaddr_in server_addr;

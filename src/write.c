@@ -27,12 +27,14 @@ thread_handler(void* arg)
 	char* filename;
 	FILE* fp;
 
-	_STRESS_MUST(asprintf(&filename, "%s/file%d", targ->base_dir,
-	                      targ->thread_num) > 0,
-	             "Couldn't create name for file %d", i);
+	_STRESS_MUST(
+	  asprintf(&filename, "%s/file%d", targ->base_dir, targ->thread_num) >
+	    0,
+	  "Couldn't create name for file %d",
+	  i);
 
-	_STRESS_MUST((fp = fopen(filename, "w+")), "Couldn't create file %s",
-	             filename);
+	_STRESS_MUST(
+	  (fp = fopen(filename, "w+")), "Couldn't create file %s", filename);
 
 	int fd = fileno(fp);
 
@@ -42,14 +44,16 @@ thread_handler(void* arg)
 			_STRESS_MUST(
 			  write(fd, file_buffer, CHUNK_SIZE) != -1,
 			  "Couldn't properly write chunk to file %s (fd=%d)",
-			  filename, fd);
+			  filename,
+			  fd);
 		}
 		_STRESS_MUST(
 		  fsync(fd) != -1,
 		  "Couldn't sync filedescriptor with disk (fname=%s)",
 		  filename);
 		_STRESS_MUST(lseek(fd, 0, SEEK_SET) != -1,
-		             "Couldn't seek to init of file %s", filename);
+		             "Couldn't seek to init of file %s",
+		             filename);
 		i = writes;
 	}
 
@@ -65,12 +69,12 @@ main(int argc, char** argv)
 	stress_parse_args(argc, argv, &args);
 	_STRESS_MUST(strlen(args.d), "a base directory must be specified");
 
-	thread_arg_t thread1arg = {.count = args.n,
-		                   .base_dir = args.d,
-		                   .thread_num = 0 };
-	thread_arg_t thread2arg = {.count = args.n,
-		                   .base_dir = args.d,
-		                   .thread_num = 1 };
+	thread_arg_t thread1arg = { .count = args.n,
+		                    .base_dir = args.d,
+		                    .thread_num = 0 };
+	thread_arg_t thread2arg = { .count = args.n,
+		                    .base_dir = args.d,
+		                    .thread_num = 1 };
 
 	srand(time(NULL));
 

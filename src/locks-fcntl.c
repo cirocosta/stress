@@ -1,4 +1,5 @@
 #include "./common.h"
+#include <fcntl.h>
 #include <sys/file.h>
 
 /**
@@ -23,18 +24,20 @@ create_file(const char* base, const int i)
 {
 	FILE* fp;
 	char* filename;
-        struct flock lock = {0};
+	struct flock lock = { 0 };
 
-        lock.l_type = F_WRLCK;
-
+	lock.l_type = F_WRLCK;
 
 	_STRESS_MUST(asprintf(&filename, "%s/file%d", base, i) > 0,
-	             "Couldn't create name for file %d", i);
-	_STRESS_MUST((fp = fopen(filename, "a")), "Couldn't create file %s",
-	             filename);
+	             "Couldn't create name for file %d",
+	             i);
+	_STRESS_MUST(
+	  (fp = fopen(filename, "a")), "Couldn't create file %s", filename);
 
-        _STRESS_MUST_P(fcntl(fileno(fp), F_SETLKW, &lock) != -1, "fcntl",
-                        "Couldn't acquire lock on %s", filename);
+	_STRESS_MUST_P(fcntl(fileno(fp), F_SETLKW, &lock) != -1,
+	               "fcntl",
+	               "Couldn't acquire lock on %s",
+	               filename);
 
 	fprintf(fp, "dummy");
 	free(filename);
@@ -51,7 +54,8 @@ create_files(int n)
 	             "Directory %s already exists. Please delete it and rerun.",
 	             files_directory);
 	_STRESS_MUST(mkdir(files_directory, 0700) != -1,
-	             "Couldn't create %s directory", files_directory);
+	             "Couldn't create %s directory",
+	             files_directory);
 
 	printf("%d files will be created\n", n);
 	for (; i++ < n;) {

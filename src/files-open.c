@@ -18,9 +18,10 @@ create_file(const char* base, const int i)
 	char* filename;
 
 	_STRESS_MUST(asprintf(&filename, "%s/file%d", base, i) > 0,
-	             "Couldn't create name for file %d", i);
-	_STRESS_MUST((fp = fopen(filename, "a")), "Couldn't create file %s",
-	             filename);
+	             "Couldn't create name for file %d",
+	             i);
+	_STRESS_MUST(
+	  (fp = fopen(filename, "a")), "Couldn't create file %s", filename);
 	fprintf(fp, "dummy");
 	free(filename);
 }
@@ -36,7 +37,8 @@ create_files(int n)
 	             "Directory %s already exists. Please delete it and rerun.",
 	             files_directory);
 	_STRESS_MUST(mkdir(files_directory, 0700) != -1,
-	             "Couldn't create %s directory", files_directory);
+	             "Couldn't create %s directory",
+	             files_directory);
 
 	printf("%d files will be created\n", n);
 	for (; i++ < n;) {

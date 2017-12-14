@@ -29,14 +29,16 @@ fork_so_much(const int n)
 	pid_t pid;
 
 	_STRESS_MUST(pid_buffer = malloc(sizeof(pid_t) * n),
-	             "couldn't allocate pid_buffer - size=%d", n);
+	             "couldn't allocate pid_buffer - size=%d",
+	             n);
 
 	while (1) {
 		printf("pid = %d\n", pid_buffer[fp]);
 
 		if (pid_buffer[fp] != 0) {
 			_STRESS_MUST_P(kill(pid_buffer[fp], SIGKILL) == 0,
-			               "kill", "failed killing child");
+			               "kill",
+			               "failed killing child");
 			waitpid(pid_buffer[fp], NULL, 0);
 		}
 

@@ -30,12 +30,14 @@ make_socket_non_blocking(int sfd)
 	int flags;
 	int s;
 
-	_STRESS_MUST_P((flags = fcntl(sfd, F_GETFL, 0)) != -1, "fcntl",
+	_STRESS_MUST_P((flags = fcntl(sfd, F_GETFL, 0)) != -1,
+	               "fcntl",
 	               "Couldn't retrieve flags from socket file descriptor");
 
 	flags |= O_NONBLOCK;
 	_STRESS_MUST_P(
-	  (s = fcntl(sfd, F_SETFL, flags)) != -1, "fcntl",
+	  (s = fcntl(sfd, F_SETFL, flags)) != -1,
+	  "fcntl",
 	  "Couldn't set nonblocking flags on socket file descriptor");
 }
 
@@ -65,7 +67,8 @@ create_and_bind(char* port)
 	hints.ai_flags = AI_PASSIVE;     // All Ifaces
 
 	_STRESS_MUST((s = getaddrinfo(NULL, port, &hints, &result)) == 0,
-	             "Couldn't get addr info - %s", gai_strerror(s));
+	             "Couldn't get addr info - %s",
+	             gai_strerror(s));
 
 	for (rp = result; rp != NULL; rp = rp->ai_next) {
 		sfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
@@ -122,16 +125,19 @@ main(int argc, char* argv[])
 	sfd = create_and_bind(argv[1]);
 	make_socket_non_blocking(sfd);
 
-	_STRESS_MUST_P((s = listen(sfd, SOMAXCONN)) != -1, "listen",
+	_STRESS_MUST_P((s = listen(sfd, SOMAXCONN)) != -1,
+	               "listen",
 	               "couldn't make socket fd listen.");
-	_STRESS_MUST_P((efd = epoll_create1(0)) != -1, "epoll_create1",
+	_STRESS_MUST_P((efd = epoll_create1(0)) != -1,
+	               "epoll_create1",
 	               "Couldn't create epoll fd");
 
 	event.data.fd = sfd;
 	event.events = EPOLLIN | EPOLLET;
 
 	_STRESS_MUST_P((s = epoll_ctl(efd, EPOLL_CTL_ADD, sfd, &event)) != -1,
-	               "epoll_ctl", "Couldn't set events data for epoll");
+	               "epoll_ctl",
+	               "Couldn't set events data for epoll");
 
 	_STRESS_MUST((events = calloc(MAXEVENTS, sizeof event)),
 	             "couldn't allocate memory for epoll evs");
@@ -170,7 +176,8 @@ main(int argc, char* argv[])
 						}
 
 						_STRESS_MUST_P(
-						  0, "accept",
+						  0,
+						  "accept",
 						  "Unexpected error accepting "
 						  "connection");
 					}
@@ -183,10 +190,13 @@ main(int argc, char* argv[])
 					event.data.fd = infd;
 					event.events = EPOLLIN | EPOLLET;
 					_STRESS_MUST_P(
-					  (s = epoll_ctl(efd, EPOLL_CTL_ADD,
-					                 infd, &event)) != -1,
-					  "epoll_ctl", "Couldn't make client "
-					               "fd be monitored");
+					  (s = epoll_ctl(efd,
+					                 EPOLL_CTL_ADD,
+					                 infd,
+					                 &event)) != -1,
+					  "epoll_ctl",
+					  "Couldn't make client "
+					  "fd be monitored");
 				}
 
 				continue;
@@ -211,8 +221,10 @@ main(int argc, char* argv[])
 					// content. This allows us to avoid
 					// copying from kernel space to
 					// userspace.
-					count = recv(events[i].data.fd, buf,
-					             sizeof buf, MSG_TRUNC);
+					count = recv(events[i].data.fd,
+					             buf,
+					             sizeof buf,
+					             MSG_TRUNC);
 					if (count == -1) {
 						// We have read all data.
 						// Go back to the main loop.
